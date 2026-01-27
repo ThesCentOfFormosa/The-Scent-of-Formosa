@@ -32,12 +32,14 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* 煙霧畫布 */
         #smoke-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 9999; 
             opacity: 1; 
         }
 
+        /* 網頁紋理背景 */
         body::before {
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('https://www.transparenttextures.com/patterns/stardust.png');
@@ -133,17 +135,18 @@
         }
         
         .slogan-text {
-            font-size: 1.5rem;
+            font-size: 2.2rem;
             font-weight: 400;
             letter-spacing: 0.8rem;
             color: var(--ink-black);
-            opacity: 0; /* 初始隱藏，等待動畫 */
+            opacity: 0;
             transform: translateY(30px);
         }
 
         /* 3. Page A */
         .page-a { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
         .page-a-content { max-width: 450px; }
+        
         .taiwan-map-container { 
             width: 100%; 
             height: 500px; 
@@ -153,7 +156,20 @@
             border-left: 0.5px solid var(--line-color);
             padding-left: 40px;
         }
-        .taiwan-map-container img { max-width: 100%; max-height: 100%; object-fit: contain; opacity: 0.8; }
+        
+        /* 【修改】地圖互動樣式：移除 cursor: pointer，保留放大效果 */
+        .taiwan-map-container img { 
+            max-width: 100%; 
+            max-height: 100%; 
+            object-fit: contain; 
+            opacity: 0.9;
+            transition: transform 0.4s ease;
+            pointer-events: auto; /* 確保可以被點擊 */
+        }
+        .taiwan-map-container img:hover {
+            transform: scale(1.05); 
+            opacity: 1;
+        }
 
         /* 4. Page B */
         .page-b { text-align: center; max-width: 800px; margin: 0 auto; }
@@ -222,24 +238,9 @@
         .btn-minimal { display: inline-block; padding: 10px 25px; border: 0.5px solid var(--ink-black); background: none; margin-top: 40px; letter-spacing: 2px; text-transform: uppercase; font-size: 0.7rem; transition: 0.4s; pointer-events: auto; }
         .btn-minimal:hover { background: rgba(73, 55, 40, 0.05); letter-spacing: 4px; }
 
-        /* --- 動畫關鍵 (手機版也適用) --- */
-        .fade-in { 
-            opacity: 0; 
-            transform: translateY(30px); 
-            transition: opacity 1.5s ease-out, transform 1.5s ease-out; 
-        }
-        /* 加上 .show 後觸發動畫 */
-        .fade-in.show { 
-            opacity: 1; 
-            transform: translateY(0); 
-        }
-        
-        /* 標語專用動畫 */
-        .slogan-text.show { 
-            opacity: 1; 
-            transform: translateY(0); 
-            transition: opacity 2s ease-out, transform 2s ease-out; 
-        }
+        .fade-in { opacity: 0; transform: translateY(30px); transition: 1.5s cubic-bezier(0.23, 1, 0.32, 1); }
+        .fade-in.show { opacity: 1; transform: translateY(0); }
+        .slogan-text.show { opacity: 1; transform: translateY(0); transition: opacity 2s ease-out, transform 2s ease-out; }
 
         /* ========================================= */
         /* 手機版響應式設定 (RWD)                    */
@@ -271,7 +272,6 @@
             h2 { font-size: 1.5rem !important; }
             p { font-size: 0.95rem; line-height: 1.8; }
             
-            /* 手機版文字動畫微調：讓動畫反應更快一點，避免使用者滑太快沒看到 */
             .fade-in { transition-duration: 1.2s; } 
         }
     </style>
@@ -316,7 +316,7 @@
             <p style="font-weight: 300;">我們透過「香氣」轉化沈默的地層，讓冷硬的地質數據成為可以被嗅聞、被觸摸的島嶼記憶。</p>
         </div>
         <div class="taiwan-map-container">
-            <img src="taiwan-map.webp" alt="台灣地質分佈圖">
+            <img src="taiwan-map.webp" alt="台灣地質分佈圖" onclick="openZoom(this.src)" title="點擊放大地圖">
         </div>
     </section>
 
@@ -427,11 +427,10 @@
             cursor.style.top = e.clientY + 'px';
         });
 
-        // 2. 滾動淡入觀察 (處理文字與圖片淡入動畫)
+        // 2. 滾動淡入觀察
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); });
         }, { threshold: 0.1 });
-        // 選擇所有 .fade-in 以及 .slogan-text 元素
         document.querySelectorAll('.fade-in, .slogan-text').forEach(el => observer.observe(el));
 
         // 3. 背景變色邏輯 與 Logo 變色
@@ -444,7 +443,6 @@
                 { id: 'east', color: '#369040' }
             ];
             
-            // 處理 Header 變色 (離開第一頁影片後變深色)
             const heroHeight = document.querySelector('.hero-video-section').offsetHeight;
             if (scroll > heroHeight - 50) {
                 document.body.classList.remove('on-hero');
@@ -464,7 +462,7 @@
             document.body.style.backgroundColor = activeColor;
         });
 
-        // 4. 煙霧粒子動畫 - 【修改】手機版有互動 & 減速
+        // 4. 煙霧粒子動畫
         const canvas = document.getElementById('smoke-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -478,15 +476,12 @@
                 this.size = Math.random() * 50 + 30; 
                 this.opacity = 0.5; 
                 
-                // 偵測是否為手機版
                 const isMobile = window.innerWidth < 768;
 
                 if (isMobile) {
-                    // 【修改】手機版：速度減慢，緩緩飄
                     this.vx = Math.random() * 0.5 - 0.25; 
                     this.vy = Math.random() * -0.8 - 0.2; 
                 } else {
-                    // 電腦版：正常速度
                     this.vx = Math.random() * 1 - 0.5; 
                     this.vy = Math.random() * -1.5 - 0.5; 
                 }
@@ -501,13 +496,9 @@
                 ctx.save();
                 ctx.beginPath();
                 let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                
-                // 純白色煙霧
                 const smokeColor = '255, 255, 255'; 
-                
                 gradient.addColorStop(0, `rgba(${smokeColor}, ${this.opacity})`);
                 gradient.addColorStop(1, `rgba(${smokeColor}, 0)`);
-                
                 ctx.fillStyle = gradient;
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -517,26 +508,21 @@
 
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // 隨機產生粒子
             if (Math.random() < 0.12) particles.push(new Particle(Math.random() * canvas.width, canvas.height + 50));
-            
             particles.forEach((p, i) => { 
-                p.update(); 
-                p.draw(); 
+                p.update(); p.draw(); 
                 if (p.opacity <= 0) particles.splice(i, 1); 
             });
             requestAnimationFrame(animate);
         }
         animate();
         
-        // 滑鼠互動
         window.addEventListener('mousemove', (e) => { 
             if (Math.random() < 0.25) particles.push(new Particle(e.clientX, e.clientY)); 
         });
 
-        // 【新增】手機觸控互動 (手指滑動產生煙霧)
         window.addEventListener('touchmove', (e) => { 
-            if (Math.random() < 0.2) { // 稍微降低機率避免產生太多粒子
+            if (Math.random() < 0.2) { 
                 const touch = e.touches[0];
                 particles.push(new Particle(touch.clientX, touch.clientY)); 
             }
@@ -555,7 +541,7 @@
             }
         }
 
-        // 6. 彈窗邏輯
+        // 6. 彈窗與圖片放大邏輯
         function openModal(id) {
             const modal = document.getElementById('modal-overlay');
             document.getElementById('modal-body').innerHTML = document.getElementById(id).innerHTML;
@@ -563,6 +549,16 @@
             setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden'; 
         }
+        
+        function openZoom(src) {
+            const modal = document.getElementById('modal-overlay');
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `<img src="${src}" style="width:100%; height:auto; border-radius:4px;">`;
+            modal.style.display = 'block';
+            setTimeout(() => modal.classList.add('active'), 10);
+            document.body.style.overflow = 'hidden';
+        }
+
         function closeModal() {
             const modal = document.getElementById('modal-overlay');
             modal.classList.remove('active');
