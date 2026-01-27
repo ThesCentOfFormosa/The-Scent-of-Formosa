@@ -6,7 +6,7 @@
     <title>島嶼地息 | THE SCENT OF FORMOSA</title>
     
     <link rel="icon" href="logo1.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400&family=Noto+Serif+TC:wght@400;500;600&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -32,6 +32,39 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        /* --- 語言切換邏輯 --- */
+        /* 預設顯示中文，隱藏英文 */
+        .en { display: none !important; }
+        .zh { display: block; }
+
+        /* 當 body 有 .lang-en 類別時，切換顯示 */
+        body.lang-en .zh { display: none !important; }
+        body.lang-en .en { display: block !important; }
+
+        /* 語言切換按鈕 */
+        .lang-switch-btn {
+            position: fixed;
+            top: 30px;
+            right: 5vw;
+            z-index: 10002;
+            cursor: pointer;
+            font-family: 'Cinzel', serif;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            color: #fff;
+            mix-blend-mode: difference; /* 讓按鈕在任何背景都清楚 */
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: 0.3s;
+            pointer-events: auto;
+            backdrop-filter: blur(2px);
+        }
+        .lang-switch-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* 煙霧畫布 */
         #smoke-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 9999; 
@@ -52,29 +85,8 @@
         header .logo-box { pointer-events: auto; width: 120px; }
         header img { width: 100%; transition: filter 1s ease; }
         
-        .lang-switch {
-            pointer-events: auto;
-            font-family: 'Noto Serif TC', serif;
-            font-size: 0.9rem;
-            cursor: pointer;
-            padding: 5px 10px;
-            border: 1px solid var(--ink-black);
-            border-radius: 20px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1001;
-        }
-        .lang-switch:hover {
-            background: var(--ink-black);
-            color: var(--paper-bg);
-        }
-
         body.on-hero header img { filter: brightness(0) invert(1); }
-        body.on-hero .lang-switch { color: white; border-color: white; }
-        body.on-hero .lang-switch:hover { background: white; color: black; }
-        
         body.scrolled header img { filter: none; }
-        body.scrolled .lang-switch { color: var(--ink-black); border-color: var(--ink-black); }
 
         #custom-cursor {
             position: fixed; width: 22px; height: 22px; border: 1px solid var(--ink-black);
@@ -153,7 +165,7 @@
         }
         
         .slogan-text {
-            font-size: 1.2rem;
+            font-size: 2.2rem;
             font-weight: 400;
             letter-spacing: 0.8rem;
             color: var(--ink-black);
@@ -188,6 +200,72 @@
             opacity: 1;
         }
 
+        /* --- 土壤圖鑑區塊：優化滑動 --- */
+        .soil-archive-section {
+            padding: 80px 0;
+            background: rgba(255,255,255,0.4);
+            overflow: hidden;
+        }
+        
+        .soil-scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            /* 增加 padding，讓第一張卡片不會貼邊 */
+            padding: 20px 5vw 40px 5vw; 
+            
+            /* 【優化】強制置中對齊，滑動時會有「吸附感」 */
+            scroll-snap-type: x mandatory; 
+            
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; 
+        }
+        .soil-scroll-container::-webkit-scrollbar { display: none; }
+
+        .soil-item {
+            flex: 0 0 300px; /* 電腦版寬度 */
+            border: 1px solid rgba(73, 55, 40, 0.2);
+            padding: 35px 30px;
+            background: rgba(249, 247, 242, 0.95);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            position: relative;
+            
+            /* 【優化】讓卡片總是對齊畫面中央 */
+            scroll-snap-align: center; 
+        }
+        .soil-item:hover {
+            background: #fff;
+            border-color: var(--ink-black);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+        }
+        .soil-name {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--brand-brown);
+            font-weight: 600;
+            border-bottom: 1px solid var(--line-color);
+            padding-bottom: 15px;
+        }
+        .soil-detail {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        .soil-label {
+            font-size: 0.7rem;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+        }
+
         /* 4. Page B */
         .page-b { text-align: center; max-width: 800px; margin: 0 auto; }
         .scent-flow { display: flex; justify-content: space-between; align-items: center; margin: 60px 0; font-size: 0.75rem; letter-spacing: 3px; opacity: 0.7; }
@@ -220,7 +298,7 @@
         .product-card:hover .product-img-box img { transform: scale(1.1); }
         .product-card h3 { font-size: 1.1rem; margin-bottom: 5px; }
 
-        .separator-space { min-height: 40vh; background-color: var(--paper-bg) !important; display: flex; align-items: center; justify-content: center; z-index: 5; }
+        .separator-space { min-height: 40vh; background-color: var(--paper-bg) !important; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 5; }
 
         footer { 
             background-color: var(--ink-black) !important; 
@@ -259,6 +337,9 @@
         .fade-in.show { opacity: 1; transform: translateY(0); }
         .slogan-text.show { opacity: 1; transform: translateY(0); transition: opacity 2s ease-out, transform 2s ease-out; }
 
+        /* ========================================= */
+        /* 手機版響應式設定 (RWD)                    */
+        /* ========================================= */
         @media screen and (max-width: 768px) {
             * { cursor: auto !important; }
             #custom-cursor { display: none !important; }
@@ -275,6 +356,9 @@
                 padding-top: 30px;
             }
 
+            /* 手機版卡片寬度調整，搭配 Center Snap 會有很好滑的效果 */
+            .soil-item { flex: 0 0 80vw; } 
+
             .scent-flow { flex-direction: column; gap: 15px; }
             .flow-line-container { width: 1px; height: 30px; margin: 0; }
             .flow-line-inner { width: 100%; height: 0; top: 0; transition: height 2s; }
@@ -282,8 +366,8 @@
 
             .product-grid { grid-template-columns: 1fr; gap: 60px; }
 
-            .slogan-text { font-size: 1.2rem; letter-spacing: 0.5rem; }
-            h2 { font-size: 1.2rem !important; }
+            .slogan-text { font-size: 1.5rem; letter-spacing: 0.5rem; }
+            h2 { font-size: 1.5rem !important; }
             p { font-size: 0.95rem; line-height: 1.8; }
             
             .fade-in { transition-duration: 1.2s; } 
@@ -299,8 +383,9 @@
         <div class="logo-box">
             <img src="LOGO.png" alt="島嶼地息 LOGO">
         </div>
-        <div class="lang-switch" onclick="toggleLanguage()">EN</div>
     </header>
+
+    <div class="lang-switch-btn" onclick="toggleLanguage()">EN / 中</div>
 
     <div id="modal-overlay" class="modal">
         <span class="close" onclick="closeModal()">✕</span>
@@ -316,228 +401,381 @@
             </video>
         </div>
         <div class="sound-toggle" onclick="toggleSound()">
-            SOUND ON 🔈
+            <span class="zh">開啟聲音 🔈</span>
+            <span class="en">SOUND ON 🔈</span>
         </div>
     </section>
 
     <section class="slogan-section">
-        <h2 class="slogan-text fade-in" data-key="slogan">從土壤開始，聞見台灣</h2>
+        <h2 class="slogan-text fade-in">
+            <span class="zh">從土壤開始，聞見台灣</span>
+            <span class="en">From the Soil, Scent of Formosa</span>
+        </h2>
     </section>
 
     <section class="page-a fade-in">
         <div class="page-a-content">
-            <h2 style="font-size: 1.8rem; margin-bottom: 30px;" data-key="intro-title">地層下的沈默敘事</h2>
-            <p style="margin-bottom: 20px; font-weight: 300;" data-key="intro-p1">世界 12 種土綱中，台灣奇蹟般擁有了 11 種。這座島嶼在極小面積內，濃縮了全球地質的萬年演化。</p>
-            <p style="font-weight: 300;" data-key="intro-p2">我們透過「香氣」轉化沈默的地層，讓冷硬的地質數據成為可以被嗅聞、被觸摸的島嶼記憶。</p>
+            <h2 style="font-size: 1.8rem; margin-bottom: 30px;">
+                <span class="zh">地層下的沈默敘事</span>
+                <span class="en">Silent Narrative of Strata</span>
+            </h2>
+            <div class="zh">
+                <p style="margin-bottom: 20px; font-weight: 300;">世界 12 種土綱中，台灣奇蹟般擁有了 11 種。這座島嶼在極小面積內，濃縮了全球地質的萬年演化。</p>
+                <p style="font-weight: 300;">我們透過「香氣」轉化沈默的地層，讓冷硬的地質數據成為可以被嗅聞、被觸摸的島嶼記憶。</p>
+            </div>
+            <div class="en">
+                <p style="margin-bottom: 20px; font-weight: 300;">Taiwan possesses 11 of the 12 soil orders in the world. This island condenses thousands of years of geological evolution in a remarkably small area.</p>
+                <p style="font-weight: 300;">We translate silent strata into "scent," turning cold geological data into island memories that can be smelled and touched.</p>
+            </div>
         </div>
         <div class="taiwan-map-container">
-            <img src="taiwan-map.webp" alt="台灣地質分佈圖" onclick="openZoom(this.src)" title="點擊放大地圖">
+            <img src="taiwan-map.webp" alt="台灣地質分佈圖" onclick="openZoom(this.src)" title="點擊放大 Click to Zoom">
+        </div>
+    </section>
+
+    <section class="soil-archive-section fade-in">
+        <h2 class="soil-title" style="text-align: center; margin-bottom: 10px;">
+            <span class="zh">島嶼土壤圖鑑</span>
+            <span class="en">SOIL ARCHIVE</span>
+        </h2>
+        
+        <div class="soil-scroll-container">
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">新成土</span><span class="en">New Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">臨時耕作、建設用地</span><span class="en">Temporary farming, Construction</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">土壤顆粒結構鬆散</span><span class="en">Loose soil structure</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">有機質土</span><span class="en">Organic Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">水田及濕地農業</span><span class="en">Paddy fields, Wetland farming</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">深黑色、鬆軟、排水差</span><span class="en">Dark black, Soft, Poor drainage</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">灰燼土</span><span class="en">Ash Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">果樹及高山農作</span><span class="en">Fruit trees, Alpine farming</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">酸性較強、閃閃發光</span><span class="en">High acidity, Glittering</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">淋澱土</span><span class="en">Spodosols</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">原始林生態環境</span><span class="en">Primeval forest ecology</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">色澤分層、酸性較強</span><span class="en">Layered color, High acidity</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">旱境土</span><span class="en">Dry Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">耐旱作物 (易鹽鹼化)</span><span class="en">Drought-tolerant crops</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">質地緻密，含鹽類黏粒</span><span class="en">Dense texture, Saline clay</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">膨轉土</span><span class="en">Swelling Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">水稻、蔗糖</span><span class="en">Rice, Sugar cane</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">黏性大，潮濕膨脹乾燥裂開</span><span class="en">High viscosity, Expands when wet</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">黑沃土</span><span class="en">Black Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">高肥力，適合多種作物</span><span class="en">High fertility, Various crops</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">色黑或深棕，結構良好</span><span class="en">Dark brown/Black, Good structure</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">弱育土</span><span class="en">Young Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">肥力中等，一般農耕</span><span class="en">Medium fertility, General farming</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">結構色澤有變化，雨後耕種</span><span class="en">Varied color, Farm after rain</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">淋溶土</span><span class="en">Leached Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">肥力比極育土高，果樹</span><span class="en">Higher fertility, Fruit trees</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">下雨過後才能耕種</span><span class="en">Cultivation after rain</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">極育土</span><span class="en">Red Clay Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">茶樹、果樹</span><span class="en">Tea trees, Fruit trees</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">酸性較強 (需改良酸性與肥力)</span><span class="en">High acidity (Needs improvement)</span>
+                </div>
+            </div>
+            <div class="soil-item">
+                <div class="soil-name"><span class="zh">氧化物土</span><span class="en">Oxide Soil</span></div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">應用</span><span class="en">Application</span></span>
+                    <span class="zh">森林或保育 (肥力低)</span><span class="en">Forest/Conservation (Low fertility)</span>
+                </div>
+                <div class="soil-detail">
+                    <span class="soil-label"><span class="zh">特徵</span><span class="en">Feature</span></span>
+                    <span class="zh">色紅，含豐富鐵鋁氧化物</span><span class="en">Red color, Rich in iron/aluminum</span>
+                </div>
+            </div>
         </div>
     </section>
 
     <section id="north" class="page-b fade-in">
-        <h2 class="soil-title" data-key="north-title">北部｜灰燼土</h2>
-        <p style="font-size: 0.8rem; letter-spacing: 2px; opacity: 0.6;">ANDISOLS</p>
+        <h2 class="soil-title">
+            <span class="zh">北部｜灰燼土</span>
+            <span class="en">North | Ash Soil</span>
+        </h2>
         <div class="scent-flow">
-            <span data-key="north-soil">灰燼地層</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="north-crop">草山柑</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="north-note">桶柑果皮調</span>
+            <span><span class="zh">灰燼地層</span><span class="en">Ash Layer</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">草山柑</span><span class="en">Caoshan Citrus</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">桶柑果皮調</span><span class="en">Citrus Peel Note</span></span>
         </div>
-        <button class="btn-minimal" onclick="openModal('story-north')" data-key="btn-explore">Explore Narrative</button>
+        <button class="btn-minimal" onclick="openModal('story-north')">
+            <span class="zh">探索故事</span><span class="en">Explore Story</span>
+        </button>
     </section>
 
     <section id="central" class="page-b fade-in">
-        <h2 class="soil-title" data-key="central-title">中部｜極育土</h2>
-        <p style="font-size: 0.8rem; letter-spacing: 2px; opacity: 0.6;">ULTISOLS</p>
+        <h2 class="soil-title">
+            <span class="zh">中部｜極育土</span>
+            <span class="en">Central | Red Clay Soil</span>
+        </h2>
         <div class="scent-flow">
-            <span data-key="central-soil">紅土高原</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="central-crop">甘露梨</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="central-note">泥香質調</span>
+            <span><span class="zh">紅土高原</span><span class="en">Red Plateau</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">甘露梨</span><span class="en">Ganlu Pear</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">泥香質調</span><span class="en">Earthy Note</span></span>
         </div>
-        <button class="btn-minimal" onclick="openModal('story-central')" data-key="btn-explore">Explore Narrative</button>
+        <button class="btn-minimal" onclick="openModal('story-central')">
+            <span class="zh">探索故事</span><span class="en">Explore Story</span>
+        </button>
     </section>
 
     <section id="south" class="page-b fade-in">
-        <h2 class="soil-title" data-key="south-title">南部｜旱境土</h2>
-        <p style="font-size: 0.8rem; letter-spacing: 2px; opacity: 0.6;">ARIDISOLS</p>
+        <h2 class="soil-title">
+            <span class="zh">南部｜旱境土</span>
+            <span class="en">South | Dry Soil</span>
+        </h2>
         <div class="scent-flow">
-            <span data-key="south-soil">鹽田遺址</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="south-crop">鹽之花</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="south-note">海洋清香</span>
+            <span><span class="zh">鹽田遺址</span><span class="en">Salt Fields</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">鹽之花</span><span class="en">Fleur de Sel</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">海洋清香</span><span class="en">Marine Note</span></span>
         </div>
-        <button class="btn-minimal" onclick="openModal('story-south')" data-key="btn-explore">Explore Narrative</button>
+        <button class="btn-minimal" onclick="openModal('story-south')">
+            <span class="zh">探索故事</span><span class="en">Explore Story</span>
+        </button>
     </section>
 
     <section id="east" class="page-b fade-in">
-        <h2 class="soil-title" data-key="east-title">東部｜膨轉土</h2>
-        <p style="font-size: 0.8rem; letter-spacing: 2px; opacity: 0.6;">VERTISOLS</p>
+        <h2 class="soil-title">
+            <span class="zh">東部｜膨轉土</span>
+            <span class="en">East | Swelling Soil</span>
+        </h2>
         <div class="scent-flow">
-            <span data-key="east-soil">縱谷脈動</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="east-crop">森林芬多精</span><div class="flow-line-container"><div class="flow-line-inner"></div></div><span data-key="east-note">苔蘚泥香</span>
+            <span><span class="zh">縱谷脈動</span><span class="en">Rift Valley</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">森林芬多精</span><span class="en">Phytoncide</span></span>
+            <div class="flow-line-container"><div class="flow-line-inner"></div></div>
+            <span><span class="zh">苔蘚泥香</span><span class="en">Mossy Earth</span></span>
         </div>
-        <button class="btn-minimal" onclick="openModal('story-east')" data-key="btn-explore">Explore Narrative</button>
+        <button class="btn-minimal" onclick="openModal('story-east')">
+            <span class="zh">探索故事</span><span class="en">Explore Story</span>
+        </button>
     </section>
 
     <section class="product-section">
-        <h2 class="soil-title" style="border-bottom: 1px solid var(--line-color); padding-bottom: 20px; font-size: 2rem;" data-key="prod-title">日常感知的延續</h2>
+        <h2 class="soil-title" style="border-bottom: 1px solid var(--line-color); padding-bottom: 20px; font-size: 2rem;">
+            <span class="zh">日常感知的延續</span>
+            <span class="en">Extension of Daily Senses</span>
+        </h2>
+        
         <div class="product-grid">
             <div class="product-card fade-in">
                 <div class="product-img-box">
                     <img src="1.jpeg" alt="塔香 DIY 禮盒">
                 </div>
-                <h3 data-key="prod-1">塔香 DIY 禮盒</h3>
+                <h3>
+                    <span class="zh">塔香 DIY 禮盒</span>
+                    <span class="en">Incense DIY Kit</span>
+                </h3>
             </div>
             <div class="product-card fade-in">
                 <div class="product-img-box">
                     <img src="2.jpg" alt="工藝線香">
                 </div>
-                <h3 data-key="prod-2">工藝線香</h3>
+                <h3>
+                    <span class="zh">工藝線香</span>
+                    <span class="en">Craft Incense</span>
+                </h3>
             </div>
             <div class="product-card fade-in">
                 <div class="product-img-box">
                     <img src="3.jpeg" alt="香氛噴霧">
                 </div>
-                <h3 data-key="prod-3">香氛噴霧</h3>
+                <h3>
+                    <span class="zh">香氛噴霧</span>
+                    <span class="en">Room Spray</span>
+                </h3>
             </div>
         </div>
     </section>
 
     <section class="separator-space">
-        <p style="opacity: 0.5; letter-spacing: 5px; font-size: 0.9rem;" data-key="slogan">從土壤開始，聞見台灣</p>
+        <p style="opacity: 0.5; letter-spacing: 5px; font-size: 0.9rem;">
+            <span class="zh">從土壤開始，聞見台灣</span>
+            <span class="en">From the Soil, Scent of Formosa</span>
+        </p>
     </section>
 
     <footer>
         <img src="logo1.png" alt="Footer Logo">
-        <p style="margin-bottom: 10px; font-weight: 300; font-family: 'Noto Serif TC', serif;" data-key="footer-brand">島嶼地息</p>
+        <p style="margin-bottom: 5px; font-weight: 300; font-family: 'Noto Serif TC', serif;">
+            <span class="zh">島嶼地息</span><span class="en">THE SCENT OF FORMOSA</span>
+        </p>
         <p style="margin-bottom: 10px;opacity: 0.6; font-size: 0.7rem;">thescentofformosa@gmail.com</p>
-        <p style="opacity: 0.6; font-size: 0.6rem;">THE SCENT OF FORMOSA © 2026</p>
+        <p style="opacity: 0.6; font-size: 0.6rem;">COPYRIGHT © 2026</p>
     </footer>
 
     <div id="story-north" style="display:none;">
         <img src="north-story.jpg" class="story-img">
-        <h3 data-key="story-n-title">台北｜在硫磺霧氣中，守護那抹消失的橘色血脈</h3>
-        <p data-key="story-n-p1"><br>在北投，草山柑不僅是一顆水果，更是這片土地流動的血脈。主理人心絨姐自述「流著北投血脈」，自小在草山腳下長大，她記憶中最深刻的味道，就是那抹帶有火山礦物氣息的酸甜。</p>
+        <h3>
+            <span class="zh">台北｜在硫磺霧氣中，守護那抹消失的橘色血脈</span>
+            <span class="en">Taipei | Protecting the Vanishing Orange Lineage in Sulfur Mist</span>
+        </h3>
+        <div class="zh">
+            <p><br>在北投，草山柑不僅是一顆水果，更是這片土地流動的血脈。主理人心絨姐自述「流著北投血脈」，自小在草山腳下長大，她記憶中最深刻的味道，就是那抹帶有火山礦物氣息的酸甜。</p>
+            <p>「草山柑是桶柑的始祖，但復育的路比想像中孤獨。」心絨姐說道。為了不讓這份在地信物消失，她與食雲集的夥伴發起復育運動，找來植物診療師、保價全收，讓近 25 位老農重新燃起鬥志。在溫泉鄉的硫磺霧氣中，她們復植了 300 株苗木，堅持將地產地銷的永續化為口中的康普茶與果醬。</p>
+        </div>
+        <div class="en">
+            <p><br>In Beitou, the Caoshan Citrus is not just a fruit, but the flowing blood of this land. Growing up at the foot of the mountain, the most profound memory is the sweet and sour taste with volcanic mineral notes.</p>
+            <p>"Caoshan Citrus is the ancestor of Tankan, but the road to restoration is lonelier than imagined." To prevent this local token from disappearing, a restoration movement was launched. In the sulfur mist of the hot spring village, 300 saplings were replanted, turning local sustainability into kombucha and jam.</p>
+        </div>
     </div>
 
     <div id="story-central" style="display:none;">
         <img src="central-story.jpg" class="story-img">
-        <h3 data-key="story-c-title">台中｜東勢山坡間的甘露梨執著</h3>
-        <p data-key="story-c-p1"><br>在台中東勢的山坡間，有一座用心經營的甘露梨果園。這裡的梨子，口感與甜度全由氣候與農人的細心決定。</p>
+        <h3>
+            <span class="zh">台中｜東勢山坡間的甘露梨執著</span>
+            <span class="en">Taichung | The Persistence of Ganlu Pears in Dongshi Hills</span>
+        </h3>
+        <div class="zh">
+            <p><br>在台中東勢的山坡間，有一座用心經營的甘露梨果園。這裡的梨子，口感與甜度全由氣候與農人的細心決定。乾旱時，果實糖度升高卻顯得粗硬；雨水過多時，雖然汁水飽滿卻少了香甜。農家面對這些自然挑戰，只能憑經驗調整採收時機，讓每一顆梨子都呈現最佳狀態。</p>
+            <p>果園以甘露梨為主要品種。農家採用套袋與減少農藥的方式，不僅確保果實安全，也維持口感。熟度的拿捏，是農夫最重要的功夫。這是一段屬於東勢的故事：土地與人共生，甜美梨子是最真誠的回報。</p>
+        </div>
+        <div class="en">
+            <p><br>In the hills of Dongshi, Taichung, there is a dedicated Ganlu Pear orchard. The texture and sweetness of the pears here are entirely determined by the climate and the care of the farmers. Facing natural challenges, farmers can only rely on experience to adjust the harvest time.</p>
+            <p>The orchard mainly grows Ganlu Pears. Farmers use bagging and reduced pesticides to ensure fruit safety and maintain texture. This is a story belonging to Dongshi: the land and people coexist, and the sweet pears are the most sincere return.</p>
+        </div>
     </div>
 
     <div id="story-south" style="display:none;">
         <img src="south-story.jpg" class="story-img">
-        <h3 data-key="story-s-title">台南｜封存在時光裡的純白，鹽田遺址間的感官備忘錄</h3>
-        <p data-key="story-s-p1"><br>台南的鹽田，是一場關於時間與烈日的馬拉松。雖然台灣在民國 91 年因成本考量全面停止了日曬鹽，但這片土地上依舊留存著關於瓦盤鹽田的記憶。</p>
+        <h3>
+            <span class="zh">台南｜封存在時光裡的純白，鹽田遺址間的感官備忘錄</span>
+            <span class="en">Tainan | Pure White Sealed in Time, Sensory Memo of Salt Fields</span>
+        </h3>
+        <div class="zh">
+            <p><br>台南的鹽田，是一場關於時間與烈日的馬拉松。雖然台灣在民國 91 年因成本考量全面停止了日曬鹽，但這片土地上依舊留存著關於瓦盤鹽田的記憶。</p>
+            <p>「雖然曬鹽已經停了，但那份與老天爺博弈的智慧不能丟。」我們與曾見證鹽業興衰的長輩對話。過去，海水需在蒸發池曝曬兩到三週，沈澱出雜質，最終在結晶池中化為純白。這份來自土地的氣息，是我們在遺址間重新採集的、關於烈日與時間最誠實的味道。</p>
+        </div>
+        <div class="en">
+            <p><br>The salt fields of Tainan are a marathon of time and scorching sun. Although Taiwan completely stopped solar salt production in 2002 due to cost considerations, memories of the tile-paved salt fields remain on this land.</p>
+            <p>"Although salt drying has stopped, the wisdom of gambling with God cannot be lost." We spoke with elders who witnessed the rise and fall of the salt industry. This scent from the land is the most honest taste of the scorching sun and time that we recollected among the ruins.</p>
+        </div>
     </div>
 
     <div id="story-east" style="display:none;">
         <img src="east-story.jpg" class="story-img">
-        <h3 data-key="story-e-title">台東｜在會呼吸的土地上，聽見縱谷林間的深呼吸</h3>
-        <p data-key="story-e-p1"><br>踏入東部縱谷，泥土會隨著季節乾濕膨脹、收縮，像是在緩慢地呼吸。在這裡，我們不談喧囂的訪談，而是跟隨大地的節奏沉靜下來。</p>
+        <h3>
+            <span class="zh">台東｜在會呼吸的土地上，聽見縱谷林間的深呼吸</span>
+            <span class="en">Taitung | Hearing the Deep Breaths of the Rift Valley on Living Soil</span>
+        </h3>
+        <div class="zh">
+            <p><br>踏入東部縱谷，泥土會隨著季節乾濕膨脹、收縮，像是在緩慢地呼吸。在這裡，我們不談喧囂的訪談，而是跟隨大地的節奏沉靜下來。</p>
+            <p>走進森林與稻間，空氣中瀰漫著一股濕潤的重量感。這種被稱為「澎轉土」的黏土質地，雖然讓建築變得困難，卻賦予了作物極強的生命張力。晨間的霧氣鎖住了苔蘚的清香，森林裡的芬多精與稻禾生長的氣息交織在一起，形成一種深沉而溫暖的穩定感。</p>
+        </div>
+        <div class="en">
+            <p><br>Stepping into the East Rift Valley, the soil expands and contracts with the wet and dry seasons, as if breathing slowly. Here, we do not talk about noisy interviews, but settle down with the rhythm of the earth.</p>
+            <p>Walking into the forest and rice paddies, the air is filled with a humid heaviness. This clay texture, known as "Vertisols," makes construction difficult but gives crops strong life tension. The morning mist locks in the scent of moss, intertwined with phytoncide from the forest.</p>
+        </div>
     </div>
 
     <script>
-        // --- 翻譯資料庫 (混合式翻譯) ---
-        const translations = {
-            "zh": {
-                "slogan": "從土壤開始，聞見台灣",
-                "intro-title": "地層下的沈默敘事",
-                "intro-p1": "世界 12 種土綱中，台灣奇蹟般擁有了 11 種。這座島嶼在極小面積內，濃縮了全球地質的萬年演化。",
-                "intro-p2": "我們透過「香氣」轉化沈默的地層，讓冷硬的地質數據成為可以被嗅聞、被觸摸的島嶼記憶。",
-                "north-title": "北部｜灰燼土",
-                "north-soil": "灰燼地層", "north-crop": "草山柑", "north-note": "桶柑果皮調",
-                "central-title": "中部｜極育土",
-                "central-soil": "紅土高原", "central-crop": "甘露梨", "central-note": "泥香質調",
-                "south-title": "南部｜旱境土",
-                "south-soil": "鹽田遺址", "south-crop": "鹽之花", "south-note": "海洋清香",
-                "east-title": "東部｜膨轉土",
-                "east-soil": "縱谷脈動", "east-crop": "森林芬多精", "east-note": "苔蘚泥香",
-                "btn-explore": "探索故事",
-                "prod-title": "日常感知的延續",
-                "prod-1": "塔香 DIY 禮盒", "prod-2": "工藝線香", "prod-3": "香氛噴霧",
-                "footer-brand": "島嶼地息",
-                
-                // 故事
-                "story-n-title": "台北｜在硫磺霧氣中，守護那抹消失的橘色血脈",
-                "story-n-p1": "<br>在北投，草山柑不僅是一顆水果，更是這片土地流動的血脈。主理人心絨姐自述「流著北投血脈」，自小在草山腳下長大，她記憶中最深刻的味道，就是那抹帶有火山礦物氣息的酸甜。",
-                
-                "story-c-title": "台中｜東勢山坡間的甘露梨執著",
-                "story-c-p1": "<br>在台中東勢的山坡間，有一座用心經營的甘露梨果園。這裡的梨子，口感與甜度全由氣候與農人的細心決定。",
-                
-                "story-s-title": "台南｜封存在時光裡的純白，鹽田遺址間的感官備忘錄",
-                "story-s-p1": "<br>台南的鹽田，是一場關於時間與烈日的馬拉松。雖然台灣在民國 91 年因成本考量全面停止了日曬鹽，但這片土地上依舊留存著關於瓦盤鹽田的記憶。",
-                
-                "story-e-title": "台東｜在會呼吸的土地上，聽見縱谷林間的深呼吸",
-                "story-e-p1": "<br>踏入東部縱谷，泥土會隨著季節乾濕膨脹、收縮，像是在緩慢地呼吸。在這裡，我們不談喧囂的訪談，而是跟隨大地的節奏沉靜下來。"
-            },
-            "en": {
-                "slogan": "The Scent of Taiwan, Rooted in Soil",
-                "intro-title": "The Silent Narrative of Strata",
-                "intro-p1": "Among the 12 soil orders in the world, Taiwan miraculously possesses 11. This island condenses thousands of years of geological evolution within a tiny area.",
-                "intro-p2": "We translate the silent strata into 'scent', turning cold geological data into island memories that can be smelled and touched.",
-                
-                // 【修改】混合式翻譯：英文地區 + 中文土壤名
-                "north-title": "North | 灰燼土",
-                "north-soil": "Ash Strata", "north-crop": "Volcano Citrus", "north-note": "Citrus Peel Note",
-                
-                "central-title": "Central | 極育土",
-                "central-soil": "Red Plateau", "central-crop": "Honey Pear", "central-note": "Earthy Note",
-                
-                "south-title": "South | 旱境土",
-                "south-soil": "Salt Fields", "south-crop": "Fleur de Sel", "south-note": "Marine Note",
-                
-                "east-title": "East | 膨轉土",
-                "east-soil": "Valley Pulse", "east-crop": "Phytoncide", "east-note": "Mossy Note",
-                
-                "btn-explore": "Explore Narrative",
-                "prod-title": "Extension of Daily Perception",
-                "prod-1": "Incense DIY Kit", "prod-2": "Craft Incense", "prod-3": "Room Spray",
-                "footer-brand": "THE SCENT OF FORMOSA",
-
-                // Stories
-                "story-n-title": "Taipei | Guarding the orange bloodline in the sulfur mist",
-                "story-n-p1": "<br>In Beitou, the Grass Mountain Citrus is not just a fruit, but the bloodline flowing through this land. Ms. Xin-Rong grew up at the foot of the mountain, her deepest memory being that sweet and sour taste tinged with volcanic minerals.",
-                
-                "story-c-title": "Taichung | The persistence of pears in the hills of Dongshi",
-                "story-c-p1": "<br>In the hills of Dongshi, Taichung, there lies a carefully cultivated pear orchard. Here, the texture and sweetness of the pears are entirely determined by the climate and the farmer's meticulous care.",
-                
-                "story-s-title": "Tainan | Pure white sealed in time, a sensory memo of salt fields",
-                "story-s-p1": "<br>The salt fields of Tainan represent a marathon against time and the scorching sun. Although sun-dried salt production ceased in 2002 due to costs, the memory of the tiled salt pans remains etched in this land.",
-                
-                "story-e-title": "Taitung | Breathing with the land in the Rift Valley forest",
-                "story-e-p1": "<br>Stepping into the East Rift Valley, the soil expands and contracts with the seasonal wet and dry cycles, as if breathing slowly. Here, we speak not of noisy interviews, but settle down to follow the rhythm of the earth."
-            }
-        };
-
-        let currentLang = 'zh';
-
+        // 1. 語言切換邏輯
         function toggleLanguage() {
-            currentLang = currentLang === 'zh' ? 'en' : 'zh';
-            const elements = document.querySelectorAll('[data-key]');
-            const btn = document.querySelector('.lang-switch');
-            
-            btn.textContent = currentLang === 'zh' ? 'EN' : '中';
-
-            elements.forEach(el => {
-                const key = el.getAttribute('data-key');
-                if (translations[currentLang][key]) {
-                    el.innerHTML = translations[currentLang][key];
-                }
-            });
+            document.body.classList.toggle('lang-en');
         }
 
-        // --- 以下維持原有功能 ---
-
+        // 2. 鼠標跟隨
         const cursor = document.getElementById('custom-cursor');
         document.addEventListener('mousemove', e => {
             cursor.style.left = e.clientX + 'px';
             cursor.style.top = e.clientY + 'px';
         });
 
+        // 3. 滾動淡入觀察
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('show'); });
         }, { threshold: 0.1 });
         document.querySelectorAll('.fade-in, .slogan-text').forEach(el => observer.observe(el));
 
+        // 4. 背景變色邏輯
         window.addEventListener('scroll', () => {
             const scroll = window.scrollY;
             const sections = [
-                { id: 'north', color: '#C86C61' }, { id: 'central', color: '#F5BD47' },
-                { id: 'south', color: '#3BB0C9' }, { id: 'east', color: '#369040' }
+                { id: 'north', color: '#C86C61' },
+                { id: 'central', color: '#F5BD47' },
+                { id: 'south', color: '#3BB0C9' },
+                { id: 'east', color: '#369040' }
             ];
             
             const heroHeight = document.querySelector('.hero-video-section').offsetHeight;
@@ -559,6 +797,7 @@
             document.body.style.backgroundColor = activeColor;
         });
 
+        // 5. 煙霧粒子動畫
         const canvas = document.getElementById('smoke-canvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
@@ -567,43 +806,87 @@
 
         class Particle {
             constructor(x, y) { 
-                this.x = x; this.y = y; 
+                this.x = x; 
+                this.y = y; 
                 this.size = Math.random() * 50 + 30; 
                 this.opacity = 0.5; 
+                
                 const isMobile = window.innerWidth < 768;
-                if (isMobile) { this.vx = Math.random() * 0.5 - 0.25; this.vy = Math.random() * -0.8 - 0.2; } 
-                else { this.vx = Math.random() * 1 - 0.5; this.vy = Math.random() * -1.5 - 0.5; }
+
+                if (isMobile) {
+                    this.vx = Math.random() * 0.5 - 0.25; 
+                    this.vy = Math.random() * -0.8 - 0.2; 
+                } else {
+                    this.vx = Math.random() * 1 - 0.5; 
+                    this.vy = Math.random() * -1.5 - 0.5; 
+                }
             }
-            update() { this.x += this.vx; this.y += this.vy; this.opacity -= 0.005; this.size += 0.8; }
+            update() { 
+                this.x += this.vx; 
+                this.y += this.vy; 
+                this.opacity -= 0.005; 
+                this.size += 0.8; 
+            }
             draw() { 
-                ctx.save(); ctx.beginPath();
+                ctx.save();
+                ctx.beginPath();
                 let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                gradient.addColorStop(0, `rgba(255, 255, 255, ${this.opacity})`);
-                gradient.addColorStop(1, `rgba(255, 255, 255, 0)`);
-                ctx.fillStyle = gradient; ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                const smokeColor = '255, 255, 255'; 
+                gradient.addColorStop(0, `rgba(${smokeColor}, ${this.opacity})`);
+                gradient.addColorStop(1, `rgba(${smokeColor}, 0)`);
+                ctx.fillStyle = gradient;
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             }
         }
+
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             if (Math.random() < 0.12) particles.push(new Particle(Math.random() * canvas.width, canvas.height + 50));
-            particles.forEach((p, i) => { p.update(); p.draw(); if (p.opacity <= 0) particles.splice(i, 1); });
+            particles.forEach((p, i) => { 
+                p.update(); p.draw(); 
+                if (p.opacity <= 0) particles.splice(i, 1); 
+            });
             requestAnimationFrame(animate);
         }
         animate();
-        window.addEventListener('mousemove', (e) => { if (Math.random() < 0.25) particles.push(new Particle(e.clientX, e.clientY)); });
-        window.addEventListener('touchmove', (e) => { if (Math.random() < 0.2) { const touch = e.touches[0]; particles.push(new Particle(touch.clientX, touch.clientY)); } });
+        
+        window.addEventListener('mousemove', (e) => { 
+            if (Math.random() < 0.25) particles.push(new Particle(e.clientX, e.clientY)); 
+        });
 
+        window.addEventListener('touchmove', (e) => { 
+            if (Math.random() < 0.2) { 
+                const touch = e.touches[0];
+                particles.push(new Particle(touch.clientX, touch.clientY)); 
+            }
+        });
+
+        // 6. 影片聲音開關
         function toggleSound() {
             const video = document.getElementById('hero-video');
             const btn = document.querySelector('.sound-toggle');
-            if(video.muted) { video.muted = false; btn.innerHTML = "SOUND OFF 🔇"; } 
-            else { video.muted = true; btn.innerHTML = "SOUND ON 🔈"; }
+            if(video.muted) {
+                video.muted = false;
+                btn.innerHTML = `<span class="zh">關閉聲音 🔇</span><span class="en">SOUND OFF 🔇</span>`;
+            } else {
+                video.muted = true;
+                btn.innerHTML = `<span class="zh">開啟聲音 🔈</span><span class="en">SOUND ON 🔈</span>`;
+            }
+            // 重新應用語言狀態
+            if(document.body.classList.contains('lang-en')) {
+                // 強制觸發一次重繪確保顯示正確語言
+                document.body.classList.remove('lang-en');
+                void document.body.offsetWidth;
+                document.body.classList.add('lang-en');
+            }
         }
-        
+
+        // 7. 彈窗與圖片放大邏輯
         function openModal(id) {
             const modal = document.getElementById('modal-overlay');
-            const source = document.getElementById(id);
-            document.getElementById('modal-body').innerHTML = source.innerHTML;
+            document.getElementById('modal-body').innerHTML = document.getElementById(id).innerHTML;
             modal.style.display = 'block';
             setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden'; 
@@ -611,11 +894,13 @@
         
         function openZoom(src) {
             const modal = document.getElementById('modal-overlay');
-            document.getElementById('modal-body').innerHTML = `<img src="${src}" style="width:100%; height:auto; border-radius:4px;">`;
+            const body = document.getElementById('modal-body');
+            body.innerHTML = `<img src="${src}" style="width:100%; height:auto; border-radius:4px;">`;
             modal.style.display = 'block';
             setTimeout(() => modal.classList.add('active'), 10);
             document.body.style.overflow = 'hidden';
         }
+
         function closeModal() {
             const modal = document.getElementById('modal-overlay');
             modal.classList.remove('active');
